@@ -4,12 +4,7 @@ class BiDirectionalPriorityQueue {
     }
 
     enqueue(item, priority) {
-        const element = {
-            item,
-            priority,
-            addedAt: Date.now()
-        };
-        this.queue.push(element);
+        this.queue.push({ item, priority });
     }
 
     dequeue(type) {
@@ -17,30 +12,17 @@ class BiDirectionalPriorityQueue {
 
         let targetIndex = 0;
 
-        if (type === 'highest') {
+        if (type === 'highest' || type === 'lowest') {
             for (let i = 1; i < this.queue.length; i++) {
-                if (this.queue[i].priority > this.queue[targetIndex].priority) {
-                    targetIndex = i;
-                }
-            }
-        } else if (type === 'lowest') {
-            for (let i = 1; i < this.queue.length; i++) {
-                if (this.queue[i].priority < this.queue[targetIndex].priority) {
-                    targetIndex = i;
-                }
+                const condition = type === 'highest' 
+                    ? this.queue[i].priority > this.queue[targetIndex].priority
+                    : this.queue[i].priority < this.queue[targetIndex].priority;
+                if (condition) targetIndex = i;
             }
         } else if (type === 'oldest') {
-            for (let i = 1; i < this.queue.length; i++) {
-                if (this.queue[i].addedAt < this.queue[targetIndex].addedAt) {
-                    targetIndex = i;
-                }
-            }
+            targetIndex = 0;
         } else if (type === 'newest') {
-            for (let i = 1; i < this.queue.length; i++) {
-                if (this.queue[i].addedAt > this.queue[targetIndex].addedAt) {
-                    targetIndex = i;
-                }
-            }
+            targetIndex = this.queue.length - 1;
         }
 
         const removed = this.queue.splice(targetIndex, 1);
@@ -50,34 +32,16 @@ class BiDirectionalPriorityQueue {
     peek(type) {
         if (this.queue.length === 0) return null;
 
-        let targetIndex = 0;
+        if (type === 'oldest') return this.queue[0];
+        if (type === 'newest') return this.queue[this.queue.length - 1];
 
-        if (type === 'highest') {
-            for (let i = 1; i < this.queue.length; i++) {
-                if (this.queue[i].priority > this.queue[targetIndex].priority) {
-                    targetIndex = i;
-                }
-            }
-        } else if (type === 'lowest') {
-            for (let i = 1; i < this.queue.length; i++) {
-                if (this.queue[i].priority < this.queue[targetIndex].priority) {
-                    targetIndex = i;
-                }
-            }
-        } else if (type === 'oldest') {
-            for (let i = 1; i < this.queue.length; i++) {
-                if (this.queue[i].addedAt < this.queue[targetIndex].addedAt) {
-                    targetIndex = i;
-                }
-            }
-        } else if (type === 'newest') {
-            for (let i = 1; i < this.queue.length; i++) {
-                if (this.queue[i].addedAt > this.queue[targetIndex].addedAt) {
-                    targetIndex = i;
-                }
-            }
+        let found = this.queue[0];
+        for (let i = 1; i < this.queue.length; i++) {
+            const condition = type === 'highest' 
+                ? this.queue[i].priority > found.priority
+                : this.queue[i].priority < found.priority;
+            if (condition) found = this.queue[i];
         }
-
-        return this.queue[targetIndex];
+        return found;
     }
 }
