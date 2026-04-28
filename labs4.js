@@ -130,4 +130,8 @@ class BiDirectionalPriorityQueue {
       i = best;
     }
   }
+
+get size() {
+    return this.dequeMap.size;
+  }
 }
