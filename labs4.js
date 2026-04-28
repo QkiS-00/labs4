@@ -1,47 +1,20 @@
 class BiDirectionalPriorityQueue {
-    constructor() {
-        this.queue = [];
-    }
+  constructor() {
+    this.minHeap = [];
+    this.maxHeap = [];
+    this.insertCounter = 0;
+    this.dequeMap = new Map(); // для oldest/newest — O(1)
+    this.headIndex = 0;
+    this.tailIndex = 0;
+  }
 
-    enqueue(item, priority) {
-        this.queue.push({ item, priority });
-    }
+  enqueue(item, priority) {
+    const order = this.insertCounter++;
+    const node = { item, priority, order };
 
-    dequeue(type) {
-        if (this.queue.length === 0) return null;
+    this._heapPush(this.minHeap, node, (a, b) => a.priority - b.priority);
+    this._heapPush(this.maxHeap, node, (a, b) => b.priority - a.priority);
 
-        let targetIndex = 0;
-
-        if (type === 'highest' || type === 'lowest') {
-            for (let i = 1; i < this.queue.length; i++) {
-                const condition = type === 'highest' 
-                    ? this.queue[i].priority > this.queue[targetIndex].priority
-                    : this.queue[i].priority < this.queue[targetIndex].priority;
-                if (condition) targetIndex = i;
-            }
-        } else if (type === 'oldest') {
-            targetIndex = 0;
-        } else if (type === 'newest') {
-            targetIndex = this.queue.length - 1;
-        }
-
-        const removed = this.queue.splice(targetIndex, 1);
-        return removed[0];
-    }
-
-    peek(type) {
-        if (this.queue.length === 0) return null;
-
-        if (type === 'oldest') return this.queue[0];
-        if (type === 'newest') return this.queue[this.queue.length - 1];
-
-        let found = this.queue[0];
-        for (let i = 1; i < this.queue.length; i++) {
-            const condition = type === 'highest' 
-                ? this.queue[i].priority > found.priority
-                : this.queue[i].priority < found.priority;
-            if (condition) found = this.queue[i];
-        }
-        return found;
-    }
+    this.dequeMap.set(this.tailIndex++, node);
+  }
 }
